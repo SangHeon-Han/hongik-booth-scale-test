@@ -1,0 +1,84 @@
+/* Room lighting also controls the app theme, including native form controls. */
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #e9e4de;
+  --muted: #b3aba3;
+  --line: #34373e;
+  --accent: #ef955d;
+  --cream: #171a20;
+  --orange: #ef955d;
+  color: var(--ink);
+  background: var(--cream);
+}
+
+[data-theme="dark"] {
+  .header,.sidebar { background:#1c1f25; border-color:var(--line); }
+  .project-bar,.statusbar,.sidebar-foot { background:#202329; border-color:var(--line); }
+  .brand-mark { background:#ab4f28; color:#ffe3bf; }
+  .brand h1,.sidebar-top h2,.selected-heading strong { color:#eee9e3; }
+  .version { color:#bcb1a7; border-color:#49413c; }
+  .eyebrow,.brand .eyebrow,.sidebar-top p,.sidebar-foot,.save-status,
+  .text-button,.booth-note,.booth-size small,.booth-size span,.section-label,
+  .field,.hint,.tip-card p,.bottom-note p,.bottom-note span,.clearance>p,
+  .clearance-grid span,.object-select small,.empty-state,.empty-state p,
+  .statusbar,.scale-note,.scene-caption,.scene-hint { color:#b3aba3; }
+  .section-label>span+span,.preset small,.sidebar-top .eyebrow { color:#a99f97; }
+  .project-bar input,.booth-size strong,.preset strong,.object-select,
+  .clearance-grid strong,.empty-state h3,.tip-card strong { color:#e1d8cf; }
+  .divider,.tool-divider,.view-controls>span { background:#414047; }
+  button { border-color:#414047; }
+  button:hover { background:#303138; border-color:#665247; }
+  button.active { background:#43332b; border-color:#946047; color:#ffb17b; }
+  button:focus-visible,input:focus-visible,select:focus-visible { outline-color:#f4a26a; }
+  .text-button:hover,.header-actions .icon-btn:hover { background:#303138; }
+  .dark,.primary,.danger { background:#b95024; border-color:#ce6935; color:#fff4e8; }
+  .dark:hover,.primary:hover,.danger:hover { background:#cf632f; color:#fff; border-color:#ea8650; }
+  input,select { background:#14171d; color:#eee3d8; border-color:#424047; }
+  input:disabled,select:disabled { background:#24262c; color:#908982; }
+  .project-bar input { background:transparent; }
+  .booth-card,.view-controls,.lighting-controls,.neighbor-toggle,.viewport-tools {
+    background:#24272fef; border-color:#44434a; box-shadow:0 5px 20px #00000026;
+  }
+  .segmented { background:#181b21; border-color:#3c3c43; }
+  .segmented button { color:#b4aba4; }
+  .segmented button.active { background:#443027; color:#ffb27c; box-shadow:0 1px 4px #00000020; }
+  .view-controls button.active,.lighting-controls button.active { background:#b95024; color:#fff3e6; }
+  .lighting-controls { background:#24272fef; }
+  .viewport-tools button.active { background:#48332a; color:#ffb27c; }
+  .viewport-tools label,.viewport-tools select { color:#c4b7ac; }
+  .viewport-tools select { background:transparent; }
+  .neighbor-toggle.active { background:#403026; border-color:#8e5b42; color:#ffbb8b; }
+  .neighbor-toggle i { background:#62606a; }
+  .neighbor-toggle.active i { background:#dd7a41; }
+  .neighbor-toggle i:after { background:#fff0e2; }
+  .tabs { border-color:var(--line); }
+  .tabs button { color:#b2a79e; }
+  .tabs button.active { color:#ffab73; background:transparent; }
+  .tabs button.active:after { background:#ed8a4e; }
+  .tabs span { color:#c4b7ac; background:#353038; }
+  .panel { scrollbar-color:#555059 transparent; }
+  .preset { background:#23262d; border-color:#3b3c43; }
+  .preset:hover { background:#2c2d34; border-color:#726053; }
+  .preset.active { background:#382c27; border-color:#a66a46; }
+  .preset.active:after { background:#f2a065; }
+  .preset-icon,.object-select>svg,.empty-state>svg { color:#c7a88f; }
+  .tip-icon { background:#3c3429; color:#dfbc7d; }
+  .selected-heading .item-badge { background:#3c3029; color:#f0b889; }
+  .feature-card,.clearance { background:#25272e; border-color:#444047; }
+  .poster-preview { background:#171a20; }
+  .check-field { color:#dfd4ca; }
+  .projection-size,.statusbar button { color:#efab78; }
+  .wall-options label { color:#c4b7ac; }
+  .object-row .icon-btn.active { background:transparent; color:#ddbc9f; }
+  .object-row .icon-btn:not(.active) { color:#968d87; }
+  .clear-message { background:#302b27; color:#d7ba9e; }
+  .warning-card,.issue-list button { background:#362d20; border-color:#665338; color:#f2c279; }
+  .statusbar .warning,.clearance-grid .negative strong { color:#ffc27d; }
+  .danger-text { color:#edaa8d; }
+  dialog { background:#202329; border-color:#51433b; color:#eee3d8; box-shadow:0 20px 80px #0009; }
+  dialog::backdrop { background:#080b11a6; }
+  dialog p,dialog dd { color:#bbb0a6; }
+  dialog dt { color:#e4c3a5; }
+  dialog .muted { background:#2d2a28; color:#c5b8ab; }
+  .toast { background:#423229; border:1px solid #78543e; color:#ffdfc3; box-shadow:0 6px 30px #0005; }
+}

@@ -1,0 +1,13 @@
+node_modules/
+dist/
+*.log
+.server.pid
+
+# Local planning document; never publish to GitHub.
+/기획.md
+
+# Local verification captures and exported layouts.
+/qa/
+/exports/
+.env
+.env.*

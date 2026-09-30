@@ -1,0 +1,2 @@
+# Keep local planning out of repository archives as a second safeguard.
+기획.md export-ignore

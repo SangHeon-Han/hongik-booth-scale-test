@@ -1,0 +1,77 @@
+{
+  "version": 3,
+  "name": "부스",
+  "booth": "personal",
+  "discipline": "interaction",
+  "walls": {
+    "back": true,
+    "left": false,
+    "right": false,
+    "thickness": 0.04,
+    "ghost": false
+  },
+  "options": {
+    "grid": true,
+    "dimensions": true,
+    "snap": 0.05,
+    "rotationSnap": 15,
+    "lighting": "bright"
+  },
+  "items": [
+    {
+      "id": "fcd11619-66e1-436f-a0f9-f0b48d2efeb3",
+      "type": "table",
+      "name": "테이블",
+      "w": 1.2,
+      "d": 0.6,
+      "h": 0.72,
+      "color": "#cfb899",
+      "x": 0,
+      "y": 0,
+      "z": -0.36,
+      "rotation": 0,
+      "thickness": 0.035,
+      "support": null,
+      "locked": false,
+      "hidden": false
+    },
+    {
+      "id": "08ad4f26-6d5d-4667-ba42-81578d73bbf8",
+      "type": "imac",
+      "name": "iMac",
+      "w": 0.55,
+      "d": 0.2,
+      "h": 0.46,
+      "color": "#bac8c4",
+      "x": 0,
+      "y": 0,
+      "z": -0.02,
+      "rotation": 0,
+      "thickness": 0.035,
+      "support": "fcd11619-66e1-436f-a0f9-f0b48d2efeb3",
+      "locked": false,
+      "hidden": false,
+      "screen": {
+        "enabled": true,
+        "brightness": 1
+      }
+    },
+    {
+      "id": "d52a250b-f4a0-4baf-b844-ab9c98c27fb9",
+      "type": "human",
+      "name": "사람",
+      "w": 0.663,
+      "d": 0.085,
+      "h": 1.7,
+      "color": "#42698b",
+      "x": 0.48,
+      "y": 0,
+      "z": 1.12,
+      "rotation": 180,
+      "thickness": 0.035,
+      "support": null,
+      "locked": false,
+      "hidden": false
+    }
+  ]
+}
