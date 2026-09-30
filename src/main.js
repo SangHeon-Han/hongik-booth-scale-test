@@ -5,6 +5,8 @@ import {createProject,validateProject,switchLayout,copyLayout} from './project.j
 import {readPosterImage} from './images.js';
 import {projectionShape} from './projection.js';
 import { BoothScene } from './scene.js';
+import {canToggleStand,hasStand,setDisplayStand} from './display.js';
+import {mountPoster} from './model.js';
 
 const icons={
   poster:'<rect x="4" y="2" width="16" height="20" rx="1"/><circle cx="9" cy="8" r="2"/><path d="m5 18 5-5 3 3 3-5 3 7"/>',
@@ -155,11 +157,12 @@ function selectionPanel(problems){
   return `<div class="selected-heading"><div class="item-badge">${icon(o.type)}</div><div><span class="eyebrow">${PRESETS[o.type].label}</span><strong>${esc(o.name)}</strong></div><button class="icon-btn" data-action="focus" title="선택 항목에 시점 맞추기" aria-label="선택 항목에 시점 맞추기">${icon('focus')}</button></div>
   <label class="field"><span>이름</span><input data-prop="name" value="${esc(o.name)}" maxlength="80" ${dis}/></label>
   <div class="section-label spacing"><span>외형 치수</span><span>cm</span></div><div class="fields ${o.type==='human'?'one':o.type==='poster'?'two':'three'}">${o.type==='human'?number('키',cm(o.h),`data-prop="h" min="1" max="1000" ${dis}`):(o.type==='poster'?['w','h']:['w','d','h']).map((k,i)=>number({w:'가로',d:'깊이',h:'높이'}[k],cm(o[k]),`data-prop="${k}" min="0.1" max="1000" ${dis}`)).join('')}</div>
+  ${canToggleStand(o)?`<label class="check-field spacing-sm"><input type="checkbox" data-stand="enabled" ${hasStand(o)?'checked':''} ${dis}/>받침 표시</label><p class="hint">${hasStand(o)?'받침을 포함한 전체 치수입니다.':'받침을 제외한 본체 치수입니다.'} 받침을 바꾸면 화면 크기는 유지하고 높이·깊이를 환산합니다. 실제 치수로 수정하세요.</p>`:''}
   ${extraPanel(o,dis)}
   ${o.type==='table'?`<div class="spacing-sm">${number('상판 두께',cm(o.thickness),`data-prop="thickness" min="0.1" max="${cm(o.h)-.1}" ${dis}`)}</div>`:''}
   ${!['table','human','poster'].includes(o.type)?`<label class="field spacing"><span>배치 기준면</span><select data-prop="support" ${dis}><option value="" ${!o.support?'selected':''}>바닥 / 직접 높이</option>${state.items.filter(t=>t.type==='table').map(t=>`<option value="${esc(t.id)}" ${o.support===t.id?'selected':''}>${esc(t.name)} 상판 · ${cm(t.y+t.h)}cm</option>`).join('')}</select></label>`:''}
   <div class="section-label spacing"><span>위치 · 부스 중앙 기준</span><span>cm</span></div><div class="fields three">${(o.type==='poster'?['x','y']:['x','z','y']).map((k,i)=>number(o.type==='poster'?{x:'벽 가로 위치',y:'설치 높이'}[k]:{x:'좌우',z:'앞뒤',y:'바닥 높이'}[k],cm(o.type==='poster'?o[k]:p[k]),`${o.type==='poster'?'data-poster-position':'data-position'}="${k}" min="${k==='y'?0:-2000}" max="${k==='y'?1000:2000}" ${o.support&&k==='y'?'disabled':dis}`)).join('')}</div>
-  <p class="hint">+좌우는 오른쪽, +앞뒤는 관람 방향입니다.${o.support?' 테이블을 움직이면 함께 이동해요.':''}</p>
+  <p class="hint">${o.type==='poster'?'벽 가로 위치는 선택한 벽의 중앙 기준, 설치 높이는 포스터 하단 기준입니다.':'+좌우는 오른쪽, +앞뒤는 관람 방향입니다.'}${o.support?' 테이블을 움직이면 함께 이동해요.':''}</p>
   <div class="fields two"><label class="field"><span>회전 (°)</span><input ${o.type==='poster'?'disabled':''} type="number" data-prop="rotation" value="${Math.round(p.rotation*10)/10}" step="${state.options.rotationSnap||1}" ${dis}/></label><label class="field"><span>색상</span><input type="color" data-prop="color" value="${o.color}" ${dis}/></label></div>
   <div class="button-row spacing-sm"><button data-action="rotate" ${o.type==='poster'?'disabled':dis}>${icon('rotate')} 90° 회전</button><button data-action="ground" ${dis}>바닥에 놓기</button></div>
   ${o.type!=='human'?`<div class="clearance"><div class="section-label"><span>부스 경계까지 여유</span><span>cm</span></div><div class="clearance-grid">${Object.entries(m).map(([key,val])=>`<div class="${val<-.001?'negative':''}"><span>${{left:'왼쪽',right:'오른쪽',back:'뒤쪽',front:'앞쪽'}[key]}</span><strong>${cm(val)}</strong></div>`).join('')}</div><p>축 방향 외곽 기준 · 음수는 부스 밖</p></div>`:''}
@@ -167,7 +170,7 @@ function selectionPanel(problems){
   <div class="button-row spacing"><button data-action="duplicate">${icon('copy')} 복제</button><button data-action="lock">${icon('lock')} ${o.locked?'잠금 해제':'잠금'}</button><button class="danger-text" data-action="delete" ${dis} aria-label="선택 항목 삭제">${icon('trash')}</button></div>`;
 }
 function extraPanel(o,dis){
-  if(o.type==='poster')return `<div class="feature-card spacing"><div class="section-label">포스터 이미지</div>${o.image?`<img class="poster-preview" src="${o.image}" alt="포스터 이미지 미리보기"/>`:'<p class="hint">이미지를 넣으면 벽에 표시됩니다.</p>'}<div class="button-row spacing-sm"><button data-action="poster-image" ${dis}>이미지 선택</button><button data-action="poster-clear" ${dis}>이미지 제거</button></div><button class="full spacing-sm" data-action="poster-fit" ${dis}>이미지 비율로 높이 맞춤</button><label class="field spacing-sm"><span>부착할 벽</span><select data-mount="wall" ${dis}>${['back','left','right'].map(k=>`<option value="${k}" ${o.mount===k?'selected':''}>${{back:'뒤쪽 벽',left:'왼쪽 벽',right:'오른쪽 벽'}[k]}</option>`).join('')}</select></label><p class="hint">PNG · JPG · WebP, 최대 10MB. 압축한 이미지가 배치 파일에 포함됩니다. 벽을 끄면 포스터도 숨겨집니다.</p></div>`;
+  if(o.type==='poster')return `<div class="feature-card spacing"><div class="section-label">부착할 벽</div><div class="segmented poster-wall-controls" aria-label="포스터 부착 벽">${['back','left','right'].map(k=>`<button data-poster-wall="${k}" class="${o.mount===k?'active':''}" aria-pressed="${o.mount===k}" ${dis}>${{back:'뒤쪽 벽',left:'왼쪽 벽',right:'오른쪽 벽'}[k]}</button>`).join('')}</div><p class="hint">벽을 선택하면 해당 가벽도 켜집니다. 벽을 향해 바라보는 기준으로 가로 위치를 조절하세요.</p><div class="section-label spacing-sm">포스터 이미지</div>${o.image?`<img class="poster-preview" src="${o.image}" alt="포스터 이미지 미리보기"/>`:'<p class="hint">이미지를 넣으면 벽에 표시됩니다.</p>'}<div class="button-row spacing-sm"><button data-action="poster-image" ${dis}>이미지 선택</button><button data-action="poster-clear" ${dis}>이미지 제거</button></div><button class="full spacing-sm" data-action="poster-fit" ${dis}>이미지 비율로 높이 맞춤</button><p class="hint">PNG · JPG · WebP, 최대 10MB. 압축한 이미지가 배치 파일에 포함됩니다. 벽을 끄면 포스터도 숨겨집니다.</p></div>`;
   if(o.type==='projector'){
     const q=o.projection,shape=projectionShape(o);
     return `<div class="feature-card spacing"><div class="section-label">프로젝터 투사 범위</div><label class="check-field"><input type="checkbox" data-projection="enabled" ${q.enabled?'checked':''} ${dis}/>투사 켜기</label><div class="fields two spacing-sm">${number('투사 거리',cm(q.distance),`data-projection="distance" min="10" max="1000" ${dis}`)}<label class="field"><span>투사비 (거리 ÷ 가로)</span><input type="number" data-projection="ratio" value="${q.ratio}" min="0.2" max="4" step="0.01" ${dis}/></label></div><label class="field spacing-sm"><span>화면 비율</span><select data-projection="aspect" ${dis}>${['16:9','4:3','1:1'].map(v=>`<option ${q.aspect===v?'selected':''}>${v}</option>`).join('')}</select></label><div class="fields two spacing-sm"><label class="field"><span>상하 각도 (°)</span><input type="number" data-projection="pitch" value="${q.pitch}" min="-60" max="60" step="1" ${dis}/></label><label class="field"><span>세로 이동 (화면 높이 배수)</span><input type="number" data-projection="shift" value="${q.shift}" min="-1" max="1" step="0.05" ${dis}/></label></div><label class="field spacing-sm"><span>발광 강도 (0–2)</span><input type="number" data-projection="brightness" value="${q.brightness}" min="0" max="2" step="0.1" ${dis}/></label><label class="field spacing-sm"><span>투사 빛 색</span><input type="color" data-projection="color" value="${q.color||'#b6dcff'}" ${dis}/></label><div class="projection-size">투사 화면 ${cm(shape.width)} × ${cm(shape.height)} cm</div><button class="full" data-action="project-back" ${dis}>뒤 벽에 맞추기</button><p class="hint">좌우 방향은 본체 회전으로 조절합니다. 설정 거리의 가상 화면이며 가림·초점·실제 밝기는 계산하지 않습니다. 벽 맞춤 후 이동하면 거리를 다시 맞춰주세요.</p></div>`;
@@ -207,7 +210,7 @@ async function action(name){
     return commit(()=>{const count=state.items.filter(o=>o.type===preset).length;const obj=item(preset,{w:draft.w,d:draft.d,h:draft.h,name:PRESETS[preset].label+(count?' '+(count+1):'')});
       if(preset==='human'){Object.assign(obj,humanSize(obj.h));obj.z=depth(state)/2+.35;obj.rotation=180;}
       else {obj.x=Math.min(count*.1,.4);obj.z=Math.min(count*.1,.4);}
-      if(preset==='poster'){obj.y=.9;obj.x=0;obj.z=0;}
+      if(preset==='poster'){obj.y=.9;obj.x=0;obj.z=0;mountPoster(obj,state,obj.mount);}
       if(preset==='projector'){obj.rotation=180;obj.z=.4;}
       if(preset==='table')obj.thickness=Math.min(.035,obj.h/4);
       state.items.push(obj);selected=obj.id;tab='selected';notify(`${obj.name}을 추가했어요. 드래그하거나 위치 값을 조정하세요.`);});
@@ -247,6 +250,7 @@ document.addEventListener('click',e=>{
   if(button.dataset.booth)return commit(()=>state.booth=button.dataset.booth);
   if(button.dataset.view){scene?.setView(button.dataset.view);document.querySelectorAll('[data-view]').forEach(el=>el.classList.toggle('active',el===button));return;}
   if(button.dataset.tab){tab=button.dataset.tab;render();return;}
+  if(button.dataset.posterWall){const o=selectedItem();if(!o||o.locked)return;const wall=button.dataset.posterWall;if(commit(()=>mountPoster(o,state,wall))){scene?.viewPosterWall(wall);document.querySelectorAll('[data-view]').forEach(el=>el.classList.toggle('active',el.dataset.view==='3d'));}return;}
   if(button.dataset.preset){preset=button.dataset.preset;draft={...PRESETS[preset]};render();return;}
   if(button.dataset.select||button.dataset.issue){selected=button.dataset.select||button.dataset.issue;tab='selected';render();if(button.dataset.issue){scene?.focus(selectedItem(),state);if(selectedItem().hidden)notify('숨겨진 집기입니다. 장면 탭에서 표시를 켤 수 있어요.');}return;}
   if(button.dataset.lock)return commit(()=>{const o=state.items.find(o=>o.id===button.dataset.lock);o.locked=!o.locked;});
@@ -261,7 +265,7 @@ function handleEdit(e){
   if(input.id==='rotation-snap')return commit(()=>state.options.rotationSnap=Number(input.value));
   if(input.dataset.wall)return commit(()=>state.walls[input.dataset.wall]=input.type==='checkbox'?input.checked:Number(input.value)/100);
   const o=selectedItem();if(!o||o.locked)return;
-  if(input.dataset.mount)return commit(()=>{o.mount=input.value;o.x=0;});
+  if(input.dataset.stand)return commit(()=>setDisplayStand(o,input.checked));
   if(input.dataset.posterPosition)return commit(()=>o[input.dataset.posterPosition]=Number(input.value)/100);
   if(input.dataset.projection)return commit(()=>{const key=input.dataset.projection;o.projection[key]=input.type==='checkbox'?input.checked:['aspect','color'].includes(key)?input.value:Number(input.value)/(key==='distance'?100:1);});
   if(input.dataset.screen)return commit(()=>o.screen[input.dataset.screen]=input.type==='checkbox'?input.checked:Number(input.value));

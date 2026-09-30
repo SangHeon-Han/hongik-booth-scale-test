@@ -50,6 +50,7 @@ GitHub Pages serves the static app built from `main`. The workflow in `.github/w
 
 - Individual/team width: **150/200 cm**. Interaction/non-interaction depth: **150/100 cm**. Height: **200 cm**. Changing the booth preserves object sizes and positions.
 - Tables, iMacs, monitors, TVs, projectors, boxes, people, and wall posters with editable dimensions. Presets are examples, not verified product specifications.
+- Monitors and TVs have a **받침 표시** (show stand) toggle in the selected-item panel. Turning it off leaves only the display body. Panel size is preserved; height and depth switch between the complete device and body-only dimensions. Enter your actual measurements as needed.
 - Drag objects or enter their position and rotation. Equipment attached to a table follows its position, rotation, and height. Click empty space to clear the selection; direction guides do not select objects.
 - Independent left/right wall toggles, with a separate wall transparency control. Walls default to 4 cm thick and sit outside the usable floor area.
 - A continuous exhibition floor extends through the booth and aisle. **부스 복제 배치** adds three empty personal Interaction booths on each side (150 × 150 × 200 cm); **전체 보기** frames the row. These are visual context, not editable items or a reconstruction of the actual exhibition plan. The main booth's wall toggles still control its side partitions. The toggle is saved independently in A/B layouts.
@@ -59,7 +60,7 @@ GitHub Pages serves the static app built from `main`. The workflow in `.github/w
 
 ## Posters
 
-Add a wall poster, choose a back/left/right wall, and upload a PNG, JPEG, or WebP image up to 10 MB. Set its width, height, horizontal wall position, and bottom height above the floor. Dragging follows the wall. Turning a wall off also hides its posters.
+Add a wall poster, choose a back/left/right wall, and upload a PNG, JPEG, or WebP image up to 10 MB. Choosing a wall turns it on and adjusts the camera to show its inside face. Changing walls centres the poster horizontally while preserving its image, dimensions, and installation height. Set its width, height, horizontal wall position, and bottom height above the floor. Dragging follows the wall. Turning a wall off also hides its posters.
 
 Images are compressed to JPEG with a maximum long edge of 1400 px and embedded in the saved layout. Transparent areas become white. The initial height follows the image ratio; the aspect-fit button restores it after manual resizing.
 

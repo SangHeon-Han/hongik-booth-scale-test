@@ -28,6 +28,7 @@ Do not edit generated files in `dist/` or `node_modules/`.
 | `src/project.js` | A/B wrapper, copy/switch operations, project validation |
 | `src/environment.js` | Continuous floor dimensions and neighboring booth geometry |
 | `src/images.js` | Poster image validation and compression |
+| `src/display.js` | Monitor/TV stand state, dimension conversion, and shared display geometry |
 | `src/projection.js` | Lens-space projection geometry |
 | `src/objects/projection.js` | Projection area, beam, and local light |
 | `src/objects/screen.js` | Front-only display face and forward light |
@@ -49,6 +50,8 @@ Do not edit generated files in `dist/` or `node_modules/`.
 - `options.neighbors` adds three empty 1.5 × 1.5 × 2 m context booths on each side, aligned at the back wall. Missing values in older files default to false. Render these under the environment root, never as selectable items or collision candidates. Preserve the main booth's wall controls and clear widths around shared partitions. Keep the floor continuous at Y=-0.005 m through the entire hall.
 - Table-supported equipment stores the table ID in `support`; X/Z/rotation are relative to it. Use `world()`, `setWorld()`, and `attach()` for coordinate changes.
 - A poster's `x` runs along its wall, `y` is its bottom height, and `mount` selects back/left/right. `world()` follows booth dimension changes. Posters cannot be table-supported.
+- Use `mountPoster()` to change a poster's wall. It enables the target wall, centres the poster only when changing walls, and respects locking. The UI calls `viewPosterWall()` to expose the inside face; manual wall visibility remains independent.
+- Monitor/TV `stand` defaults to true in legacy files. Use `setDisplayStand()` to preserve panel size while converting external height/depth (0.68/0.17 body ratios). With the stand off, dimensions describe the body and the origin remains at its bottom. Use `displayShape()` for both body and screen/light geometry. iMac stands remain fixed.
 - Use `humanSize(h)`: width = 0.39 × height, depth = 0.05 × height. It is a pictogram, not a measured human body.
 - Scene schema is v3. `validate()` migrates v1/v2 and returns the normalized scene. Older v3 projection colors default to `#b6dcff`; supplied colors must be six-digit hex values.
 - Project files use `{format:"hicd-project",version:1,active:"A",layouts:{A:scene,B:sceneOrNull}}`. `validateProject()` also wraps legacy single scenes.

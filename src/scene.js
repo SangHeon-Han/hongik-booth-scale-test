@@ -4,6 +4,7 @@ import { world, width, depth, cm, rad } from './model.js';
 import {HALL_FLOOR,neighboringBooths,neighboringWalls} from './environment.js';
 
 import {buildScreen} from './objects/screen.js';
+import {displayShape} from './display.js';
 import {buildProjection} from './objects/projection.js';
 import { buildHuman } from './objects/human.js';
 
@@ -68,6 +69,12 @@ export class BoothScene {
   focus(o,state) {
     const p=world(o,state),target=new THREE.Vector3(p.x,p.y+o.h/2,p.z);
     const delta=target.clone().sub(this.controls.target); this.camera.position.add(delta);this.controls.target.copy(target);this.controls.update();
+  }
+  viewPosterWall(wall) {
+    this.setView('3d');
+    // View the right wall from inside the booth, not through its back surface.
+    if(wall==='right')this.camera.position.x=-Math.abs(this.camera.position.x);
+    this.camera.lookAt(this.controls.target);this.controls.update();
   }
   fit() {
     this.setView(this.mode);
@@ -194,13 +201,16 @@ export class BoothScene {
       const leg=Math.min(.045,w*.1,d*.1);
       for(const x of [-1,1])for(const z of [-1,1])this.mesh(g,leg,h-o.thickness,leg,x*(w/2-leg),(h-o.thickness)/2,z*(d/2-leg),'#e2ded2');
     } else if(['imac','monitor','tv'].includes(o.type)) {
-      this.mesh(g,w,h*.68,d*.17,0,h*.66,0,color);
+      const shape=displayShape(o);
+      this.mesh(g,w,shape.height,shape.depth,0,shape.centerY,0,color);
       buildScreen(g,o,this.dark,o.screen.enabled&&o.screen.brightness>0&&this.lightCount++<8);
       // A quiet graphic distinguishes the display from the bezel without external images.
-      this.mesh(g,w*.5,h*.013,.003,-w*.15,h*.58,d*.085+.003,'#9bc1b5');
-      this.mesh(g,w*.27,h*.012,.003,-w*.265,h*.55,d*.085+.003,'#718e89');
-      this.mesh(g,w*.09,h*.35,d*.11,0,h*.195,-d*.12,color);
-      this.mesh(g,w*.34,h*.025,d,0,h*.0125,0,color);
+      this.mesh(g,w*.5,shape.height*.013/.68,.003,-w*.15,shape.centerY-shape.height*.08/.68,shape.front+.001,'#9bc1b5');
+      this.mesh(g,w*.27,shape.height*.012/.68,.003,-w*.265,shape.centerY-shape.height*.11/.68,shape.front+.001,'#718e89');
+      if(shape.stand){
+        this.mesh(g,w*.09,h*.35,d*.11,0,h*.195,-d*.12,color);
+        this.mesh(g,w*.34,h*.025,d,0,h*.0125,0,color);
+      }
     } else if(o.type==='projector') {
       this.mesh(g,w,h,d,0,h/2,0,color);
       const lens=new THREE.Mesh(new THREE.CylinderGeometry(h*.26,h*.26,.004,32),new THREE.MeshStandardMaterial({color:'#263944',metalness:.4,roughness:.15,emissive:o.projection.enabled?(o.projection.color||'#b6dcff'):'#000000',emissiveIntensity:o.projection.enabled?o.projection.brightness*(this.dark?.8:.2):0}));

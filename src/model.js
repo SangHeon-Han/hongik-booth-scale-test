@@ -1,8 +1,8 @@
 export const PRESETS = {
   table: { label: '테이블', subtitle: '상판과 다리', w: 1.2, d: .6, h: .72, color: '#cfb899' },
   imac: { label: 'iMac', subtitle: '일체형 컴퓨터', w: .55, d: .2, h: .46, color: '#bac8c4' },
-  monitor: { label: '모니터', subtitle: '스탠드 포함', w: .62, d: .22, h: .46, color: '#545e64' },
-  tv: { label: 'TV', subtitle: '스탠드 포함', w: 1.12, d: .25, h: .72, color: '#42464b' },
+  monitor: { label: '모니터', subtitle: '받침 켜기 / 끄기', w: .62, d: .22, h: .46, color: '#545e64' },
+  tv: { label: 'TV', subtitle: '받침 켜기 / 끄기', w: 1.12, d: .25, h: .72, color: '#42464b' },
   poster: { label: '벽 포스터', subtitle: '이미지 · 벽 부착', w: .6, d: .006, h: .9, color: '#ffffff' },
   projector: { label: '빔프로젝터', subtitle: '본체 · 렌즈 방향', w: .32, d: .25, h: .12, color: '#d8dce0' },
   box: { label: '직육면체', subtitle: '작품 · PC · 받침대', w: .4, d: .4, h: .6, color: '#b3b7c5' },
@@ -19,6 +19,7 @@ export function item(type, overrides = {}) {
   return { id: crypto.randomUUID(), type, name: p.label, w: p.w, d: p.d, h: p.h, color: p.color,
     x: 0, y: 0, z: 0, rotation: 0, thickness: .035, support: null, locked: false, hidden: false,
     ...(type==='poster'?{mount:'back',image:null,imageAspect:2/3,y:.9}:{}),
+    ...(['monitor','tv'].includes(type)?{stand:true}:{}),
     ...(type==='projector'?{projection:{enabled:true,distance:1,ratio:1.2,aspect:'16:9',pitch:0,shift:0,brightness:1,color:'#b6dcff'}}:{}),
     ...(['imac','monitor','tv'].includes(type)?{screen:{enabled:true,brightness:1}}:{}), ...overrides };
 }
@@ -57,6 +58,11 @@ export function setWorld(o, state, position) {
   const w = { ...world(o, state), ...position };
   const offset = rotate(w.x - parent.x, w.z - parent.z, -parent.rotation);
   o.x = offset.x; o.z = offset.z; o.y = 0; o.rotation = w.rotation - parent.rotation;
+}
+export function mountPoster(o,state,wall) {
+  if(o.type!=='poster'||!['back','left','right'].includes(wall)||o.locked)return;
+  if(o.mount!==wall)o.x=0;
+  o.mount=wall;state.walls[wall]=true;
 }
 export function attach(o, state, parentId) {
   const w = world(o, state);
@@ -144,6 +150,7 @@ export function validate(raw) {
     if(!['w','d','h'].every(k=>finite(o[k],.001,10)) || !['x','z'].every(k=>finite(o[k],-20,20)) || !finite(o.y,0,10) || !finite(o.rotation,-36000,36000) || !finite(o.thickness,.001,1)) fail();
     if(o.type==='table' && o.thickness>=o.h) fail();
     if(typeof o.color!=='string' || !/^#[a-f0-9]{6}$/i.test(o.color) || typeof o.hidden!=='boolean' || typeof o.locked!=='boolean') fail();
+    if(['monitor','tv'].includes(o.type)&&o.stand!==undefined&&typeof o.stand!=='boolean')fail();
     if(raw.version===3) {
       if(o.type==='poster' && (!['back','left','right'].includes(o.mount)||o.support!==null||!finite(o.imageAspect,.01,100)||!(o.image===null||validImage(o.image))))fail();
       if(o.type==='projector') {
@@ -160,6 +167,7 @@ export function validate(raw) {
     if(o.type==='human' && (Math.abs(o.w-o.h*(raw.version===1?.25:.39))>.0001 || Math.abs(o.d-o.h*(raw.version===1?.16:raw.version===2?.1:.05))>.0001)) fail();
   }
   const next=clone(raw);
+  for(const o of next.items)if(['monitor','tv'].includes(o.type))o.stand??=true;
   next.options.neighbors??=false;
   if(next.version<3) {
     if(next.version===1)next.discipline='interaction';
