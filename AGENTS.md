@@ -9,6 +9,7 @@ This folder contains a 3D booth planner for the Interaction class of Hongik Univ
 - `npm test`: run the Node test suite.
 - `npm run build`: create the static app in `dist/`.
 - `실행.cmd`: Windows launcher; reuses an existing local server.
+- `실행.command`: macOS launcher; keep Terminal open, Ctrl+C stops its server. Preserve executable mode and LF line endings.
 
 Do not edit generated files in `dist/` or `node_modules/`.
 
@@ -36,6 +37,8 @@ Do not edit generated files in `dist/` or `node_modules/`.
 | `examples/` | Portable layouts with embedded poster images |
 | `qa/` | Local screenshots and verification notes |
 | `start.ps1`, `실행.cmd` | Windows startup |
+| `실행.command` | macOS startup using the system Bash, Node.js and default browser |
+| `.github/scripts/check-macos-launcher.sh` | macOS integration check: spaced paths, startup, reuse and shutdown; browser opening is stubbed |
 | `LICENSE` | MIT license and original copyright notice |
 
 ## Data rules
@@ -83,6 +86,7 @@ Do not edit generated files in `dist/` or `node_modules/`.
 
 - Write README.md and AGENTS.md in English. Keep product UI in concise Korean and preserve the warm orange style. Avoid marketing slogans.
 - Keep public documentation consistent with implemented behavior. Presets are not verified product measurements.
+- Keep the macOS launcher compatible with system Bash 3.2. Do not stop a server owned by another launch. Pages deployment waits for the macOS launcher check; Finder permissions and browser UI still require manual macOS checks.
 - `기획.md` is local-only. Preserve it on disk, but never stage, force-add, upload, or publish it to GitHub. `.gitignore` excludes it and `.gitattributes` excludes it from repository archives. Do not link it from README. Verify it is absent from the index and upload set before publishing.
 - GitHub Pages deploys pushes to `main` through `.github/workflows/deploy.yml`. The initial public release is authorized. Future local changes do not independently authorize pushing or deployment; follow the user's current request.
 - Keep `qa/`, `exports/`, `node_modules/`, `dist/`, environment files and local planning out of the source repository. The Pages artifact must contain only the production `dist/` output. Retain the user-provided cover at the top of README.

@@ -15,7 +15,24 @@ npm ci
 npm run dev
 ```
 
-Open http://127.0.0.1:4310/. On Windows, double-click `실행.cmd` to build and open a local preview. Do not open `index.html` directly. The first dependency installation needs internet access; the app runs without external fonts, images, or CDNs afterward.
+Open http://127.0.0.1:4310/. Do not open `index.html` directly. The first dependency installation needs internet access; the app runs without external fonts, images, or CDNs afterward. Use a supported Node.js LTS version (20.19+ or 22.12+).
+
+### Windows
+
+Double-click `실행.cmd` to build and open a local preview.
+
+### macOS
+
+Install Node.js LTS, then double-click `실행.command`. The launcher installs missing dependencies, builds the app, starts a local server and opens your default browser. Keep its Terminal window open while using the app; press **Ctrl+C** to stop the server. Launching it again reuses the running server.
+
+If an extracted ZIP does not preserve execution permissions, open Terminal in the project folder and run:
+
+```sh
+chmod +x ./실행.command
+./실행.command
+```
+
+You can also run `bash ./실행.command` from that folder. The same files work with Apple Silicon and Intel Macs when using a compatible Node.js installation. macOS may ask you to approve opening a downloaded script. Local browser layouts stay at `http://127.0.0.1:4310/`; switching to the hosted website does not automatically transfer them, so use JSON export/import.
 
 ```sh
 npm test          # Geometry, layouts, migration, and lighting checks
@@ -27,7 +44,7 @@ No account or backend is required. Layouts and uploaded poster images stay in yo
 
 ## Web deployment
 
-GitHub Pages serves the static app built from `main`. The workflow in `.github/workflows/deploy.yml` installs dependencies, runs tests, builds, and deploys `dist/`. In repository **Settings → Pages**, select **GitHub Actions** as the source. Relative asset URLs support project subpaths and forks without changing the build configuration.
+GitHub Pages serves the static app built from `main`. The workflow in `.github/workflows/deploy.yml` installs dependencies, runs tests, checks the launcher on macOS, builds, and deploys `dist/`. In repository **Settings → Pages**, select **GitHub Actions** as the source. Relative asset URLs support project subpaths and forks without changing the build configuration.
 
 ## Features
 
